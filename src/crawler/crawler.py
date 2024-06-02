@@ -1,10 +1,20 @@
 from typing import List
 from bs4 import BeautifulSoup
 import requests
-import sys
 
-sys.path.insert(0, "..")
-from keeper.keeper import insert_data
+
+def extract_id_from_href(href: str) -> str:
+    """
+    Given a URL, this function extracts the last part of the URL which is considered as ID.
+
+    Args:
+        url (str): The URL to process.
+
+    Returns:
+        str: The ID extracted from the URL.
+    """
+    _, _, last = href.rpartition("/")
+    return last
 
 
 def extract_links(url: str) -> List[str]:
@@ -18,7 +28,7 @@ def extract_links(url: str) -> List[str]:
         List[str]: A list of URLs from the listings.
     """
     response = requests.get(url)
-    urls = []
+    IDs = []
 
     # Check if the request was successful
     if response.status_code == 200:
@@ -36,32 +46,16 @@ def extract_links(url: str) -> List[str]:
                 if link:
                     href = link.get("href")
                     if href:
-                        href = remove_optional_part(
-                            href
-                        )  # in the link there is a persian part that is not necessary so we remove it
-                        urls.append(f"https://divar.ir{href}")
+                        id = extract_id_from_href(href)
+                        # in the link there is a persian part that is not necessary so we remove it
+                        IDs.append(id)
     else:
         print("Failed to retrieve the page")
 
-    return urls
+    return IDs
 
 
-def remove_optional_part(url: str) -> str:
-    """
-    Given a URL, this function removes the persian optional part that that is there for seo reasons i think.
-
-    Args:
-        url (str): The URL to process.
-
-    Returns:
-        str: The processed URL without the optional part.
-    """
-    base, _, last = url.rpartition("/")
-    base_url = base.rpartition("/")[0]
-    return f"{base_url}/{last}"
-
-
-def extract_real_estate_data(url: str) -> dict:
+def extract_real_estate_data(id: str) -> dict:
     """
     Given a URL of a listing, this function extracts and returns the title, price, and description of the listing. TODO: be more specefic
 
@@ -71,6 +65,8 @@ def extract_real_estate_data(url: str) -> dict:
     Returns:
         dict: A dictionary containing the title, price, and description of the listing.
     """
+    url = "https://divar.ir/v/" + id
+    
     response = requests.get(url)
     data = {}
 
@@ -144,8 +140,7 @@ def extract_real_estate_data(url: str) -> dict:
         # Extract the description
         description = soup.find("p", class_="kt-description-row__text")
         if description:
-            pass
-            # data["description"] = description.text.strip()
+            data["description"] = description.text.strip()
 
     if data:
         data["link"] = url
