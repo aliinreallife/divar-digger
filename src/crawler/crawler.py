@@ -1,6 +1,17 @@
-from typing import List
+from typing import List, Dict, Optional
 from bs4 import BeautifulSoup
 import requests
+
+
+BASE_URL = "https://divar.ir/v/"
+PARENT_CLASS = "post-list__widget-col-c1444"
+TITLE_CLASS = "kt-page-title__title"
+PRICE_CLASS = "kt-unexpandable-row__value"
+DATA_ROW_CLASS = "kt-group-row__data-row"
+GROUP_ROW_ITEM_CLASS = "kt-group-row-item"
+AGENCY_CLASS = "kt-text-truncate"
+IMAGE_CLASS = "kt-image-block__image"
+DESCRIPTION_CLASS = "kt-description-row__text"
 
 
 def extract_id_from_href(href: str) -> str:
@@ -8,7 +19,7 @@ def extract_id_from_href(href: str) -> str:
     Given a URL, this function extracts the last part of the URL which is considered as ID.
 
     Args:
-        url (str): The URL to process.
+        href (str): The URL to process.
 
     Returns:
         str: The ID extracted from the URL.
@@ -19,7 +30,7 @@ def extract_id_from_href(href: str) -> str:
 
 def extract_IDs(url: str) -> List[str]:
     """
-    Given a URL of a listings page, this function extracts and returns a list of URLs found within <a> tags in divs with the class 'post-list__widget-col-c1444'.
+    Given a URL of a listings page, this function extracts and returns a list of IDs found within <a> tags in divs with the class 'post-list__widget-col-c1444'.
 
     Args:
         url (str): The URL of the listings page to scrape.
@@ -28,128 +39,119 @@ def extract_IDs(url: str) -> List[str]:
         List[str]: A list of IDs from the listings.
     """
     response = requests.get(url)
-    IDs = []
-
-    # Check if the request was successful
-    if response.status_code == 200:
-        # Parse the HTML content of the page
-        soup = BeautifulSoup(response.content, "html.parser")
-
-        # Find all <a> tags within the specified parent class
-        parent_divs = soup.find_all("div", class_="post-list__widget-col-c1444")
-        if not parent_divs:
-            print("No parent divs found")
-        else:
-            for parent in parent_divs:
-                link = parent.find("a")
-                if link:
-                    href = link.get("href")
-                    if href:
-                        id = extract_id_from_href(href)
-                        # in the link there is a persian part that is not necessary so we remove it
-                        IDs.append(id)
-    else:
+    if response.status_code != 200:
         print("Failed to retrieve the page")
+        return []
+
+    soup = BeautifulSoup(response.content, "html.parser")
+    parent_divs = soup.find_all("div", class_=PARENT_CLASS)
+    if not parent_divs:
+        print("No parent divs found")
+        return []
+
+    IDs = []
+    for parent in parent_divs:
+        link = parent.find("a")
+        if link and link.get("href"):
+            id = extract_id_from_href(link.get("href"))
+            IDs.append(id)
 
     return IDs
 
 
-def extract_real_estate_data(id: str) -> dict:
+def extract_real_estate_data(id: str) -> Optional[Dict[str, any]]:
     """
-    Given a URL of a listing, this function extracts and returns the title, price, and description of the listing. TODO: be more specefic
+    Given an ID of a listing, this function extracts and returns the details of the listing.
 
     Args:
-        url (str): The URL of the listing to scrape.
+        id (str): The ID of the listing to scrape.
 
     Returns:
-        dict: A dictionary containing the title, price, and description of the listing.
+        dict: A dictionary containing the listing details, or None if failed to load the webpage.
     """
-    url = "https://divar.ir/v/" + id
-
+    url = BASE_URL + id
     response = requests.get(url)
+    if response.status_code != 200:
+        print(f"Failed to load webpage: {url}")
+        return None
+
+    soup = BeautifulSoup(response.content, "html.parser")
     data = {}
 
-    # Check if the request was successful
-    if response.status_code == 200:
+    # Extract the title
+    title = soup.find("div", class_=TITLE_CLASS)
+    if title:
+        data["title"] = title.text.strip()
 
-        # Parse the HTML content of the page
-        soup = BeautifulSoup(response.content, "html.parser")
+    # Extract the price
+    price = soup.find("p", class_=PRICE_CLASS)
+    if price:
+        try:
+            price_text = price.text.replace("٬", "").replace("تومان", "").strip()
+            data["price"] = int(price_text)
+        except ValueError:
+            data["price"] = "Invalid price"
 
-        # Extract the title
-        title = soup.find("div", class_="kt-page-title__title")
-        if title:
-            data["title"] = title.text.strip()
+    # Extract property details
+    data_rows = soup.find_all("tr", class_=DATA_ROW_CLASS)
+    if data_rows:
+        items = data_rows[0].find_all("td", class_=GROUP_ROW_ITEM_CLASS)
+        if len(items) == 3:
+            try:
+                data["metrage"] = int(items[0].text.strip())
+                year_text = items[1].text.strip()
+                data["year_of_construction"] = (
+                    int(year_text) if year_text.isdigit() else "Before 1370"
+                )
+                data["number_of_rooms"] = int(items[2].text.strip())
+            except ValueError:
+                data["metrage"] = data["year_of_construction"] = data[
+                    "number_of_rooms"
+                ] = "Invalid data"
 
-        # Extract the price
-        price = soup.find("p", class_="kt-unexpandable-row__value")
-        if price:
-            price = price.text
-            price = int(price.replace("٬", "").replace("تومان", ""))
-            data["price"] = price
+        if len(data_rows) > 1:
+            items = data_rows[1].find_all("td", class_=GROUP_ROW_ITEM_CLASS)
+            if len(items) == 3:
+                data["has_elevator"] = "ندارد" not in items[0].text
+                data["has_parking"] = "ندارد" not in items[1].text
+                data["has_storage_room"] = "ندارد" not in items[2].text
 
-        # Extract the metrage, year of construction, and number of rooms
-        data_row = soup.find("tr", class_="kt-group-row__data-row")
-        if data_row:
-            items = data_row.find_all("td", class_="kt-group-row-item")
-            if items and len(items) == 3:
-                metrage = int(items[0].text)
-                try:
-                    year_of_construction = int(items[1].text)
-                except:
-                    year_of_construction = (
-                        1370  # TODO: we should to somthing better for 'قبل از ۱۳۷۰'
-                    )
-                data["metrage"] = metrage
-                data["year_of_construction"] = int(items[1].text)
-                data["number_of_rooms"] = int(items[2].text)
-            # Remove the first occurrence
-            data_row.decompose()
+    # Extract agency and agent details
+    agency = soup.find("a", class_=AGENCY_CLASS)
+    if agency:
+        data["agency"] = agency.text.strip()
+        agency.decompose()
+    agent = soup.find("a", class_=AGENCY_CLASS)
+    if agent:
+        data["agent"] = agent.text.strip()
 
-        # Now find the second occurrence
-        data_row = soup.find("tr", class_="kt-group-row__data-row")
-        if data_row:
-            items = data_row.find_all("td", class_="kt-group-row-item")
-            if items and len(items) == 3:
-                elevator_info = items[0].text
-                parking_info = items[1].text
-                storage_room_info = items[2].text
+    # Extract image presence
+    image = soup.find("img", class_=IMAGE_CLASS)
+    if data:
+        data["has_image"] = bool(
+            image
+            and "ls-is-cached" not in image.get("class")
+            and "kt-image-block__image--lazy-loaded" not in image.get("class")
+        )
 
-                data["has_elevator"] = "ندارد" not in elevator_info
-                data["has_parking"] = "ندارد" not in parking_info
-                data["has_storage_room"] = "ندارد" not in storage_room_info
-
-        agency = soup.find("a", class_="kt-text-truncate")
-        if agency:
-            data["agency"] = agency.text.strip()
-            agency.decompose()
-        agent = soup.find("a", class_="kt-text-truncate")
-
-        if agent:
-            data["agent"] = agent.text.strip()
-
-        image = soup.find("img", class_="kt-image-block__image")
-        if image:
-            if "ls-is-cached" not in image.get(
-                "class"
-            ) and "kt-image-block__image--lazy-loaded" not in image.get("class"):
-                data["has_image"] = True
-            else:
-                data["has_image"] = False
-
-        # location = soup.find("div", class_="map-cm--padded") TODO: fix this
-        # if location:
-        #     data["has_location"] = True
-        # elif data:
-        #     data["has_location"] = False
-
-        # Extract the description
-        description = soup.find("p", class_="kt-description-row__text")
-        if description:
-            data["description"] = description.text.strip()
+    # Extract the description
+    description = soup.find("p", class_=DESCRIPTION_CLASS)
+    if description:
+        data["description"] = (
+            description.text.strip() if description else "No description available"
+        )
 
     if data:
         data["_id"] = id
     else:
-        print("faild to load webpage:", url)
+        print(f"Failed to extract data from {url}")
 
     return data
+
+
+# Example usage:
+# url = "https://example.com/listings"
+# ids = extract_IDs(url)
+# for id in ids:
+#     real_estate_data = extract_real_estate_data(id)
+#     print(real_estate_data)
