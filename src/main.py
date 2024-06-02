@@ -2,6 +2,7 @@ from time import sleep
 from typing import List
 from keeper.keeper import insert_data, is_id_in_database
 from crawler.crawler import extract_real_estate_data, extract_IDs
+from messenger.messenger import send_to_telegram
 from tqdm import tqdm
 
 
@@ -12,15 +13,16 @@ def blah(
     retries = 0
 
     while retries < max_retries:
-        IDs: List[str] = extract_IDs(listings_page_url)
+        item_IDs: List[str] = extract_IDs(listings_page_url)
 
-        if IDs:
-            for id in tqdm(IDs, desc="Processing items"):
+        if item_IDs:
+            for id in tqdm(item_IDs, desc="Processing items"):
                 if not is_id_in_database(id, collection_name=listings_page_url):
                     print(f"Processing item: {id}")
                     data = extract_real_estate_data(id)
                     if data:
                         insert_data(data, collection_name=listings_page_url)
+                        send_to_telegram(data)
                     else:
                         print(f"Failed to extract data for item {id}, skipping.")
                 else:
