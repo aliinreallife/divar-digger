@@ -1,6 +1,10 @@
 from typing import List
 from bs4 import BeautifulSoup
 import requests
+import sys
+
+sys.path.insert(0, "..")
+from keeper.keeper import insert_data
 
 
 def extract_links(url: str) -> List[str]:
@@ -149,10 +153,3 @@ def extract_real_estate_data(url: str) -> dict:
         print("faild to load webpage:", url)
 
     return data
-
-
-url = "https://divar.ir/v/QZAH5ALG"
-data = extract_real_estate_data(url)
-
-for key, value in data.items():
-    print(f"{key}: {value}")
