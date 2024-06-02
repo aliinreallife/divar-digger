@@ -1,17 +1,19 @@
-from typing import List, Dict, Optional
-from bs4 import BeautifulSoup
+from typing import Dict, List, Optional
+
 import requests
+from bs4 import BeautifulSoup
 
-
-BASE_URL = "https://divar.ir/v/"
-PARENT_CLASS = "post-list__widget-col-c1444"
-TITLE_CLASS = "kt-page-title__title"
-PRICE_CLASS = "kt-unexpandable-row__value"
-DATA_ROW_CLASS = "kt-group-row__data-row"
-GROUP_ROW_ITEM_CLASS = "kt-group-row-item"
-AGENCY_CLASS = "kt-text-truncate"
-IMAGE_CLASS = "kt-image-block__image"
-DESCRIPTION_CLASS = "kt-description-row__text"
+from constants import (
+    AGENCY_CLASS,
+    BASE_URL,
+    DATA_ROW_CLASS,
+    DESCRIPTION_CLASS,
+    GROUP_ROW_ITEM_CLASS,
+    IMAGE_CLASS,
+    PARENT_CLASS,
+    PRICE_CLASS,
+    TITLE_CLASS,
+)
 
 
 def extract_id_from_href(href: str) -> str:

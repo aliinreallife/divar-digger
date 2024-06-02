@@ -1,9 +1,8 @@
 from typing import Any, Dict, List
 import requests
 from os import getenv
+from constants import TELEGRAM_TOKEN
 
-BASE_URL = "divar.ir/v/"
-TOKEN = getenv("TELEGRAM_BOT_TOKEN")
 IDs = []
 
 map = {
@@ -23,12 +22,11 @@ map = {
 }
 
 
-
 def send_to_telegram(data: Dict[str, Any], IDs: List[int] = IDs):
     text = data_to_text(data)
     for id in IDs:
         response = requests.post(
-            f"https://api.telegram.org/bot{TOKEN}/sendMessage",
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
             data={"chat_id": id, "text": text, "disable_notification": "true"},
         )
 
