@@ -7,12 +7,13 @@ def blah(listings_page_url: str = "https://divar.ir/s/lavasan/buy-apartment"):
 
     IDs: List = extract_IDs(listings_page_url)
     for id in IDs:
-        if not is_id_in_database(id, collection=listings_page_url):
+        if not is_id_in_database(id, collection_name=listings_page_url):
             print(f"Processing item: {id}")
             data = extract_real_estate_data(id)
             if data:
-                insert_data(data, collection=listings_page_url)
+                insert_data(data, collection_name=listings_page_url)
         else:
             print(f"Item {id} already exists in the database, skipping.")
+
 
 blah()
