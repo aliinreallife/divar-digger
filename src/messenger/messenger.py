@@ -1,6 +1,7 @@
-from typing import Any, Dict, List
-import requests
 from os import getenv
+from typing import Any, Dict, List
+
+import requests
 
 BASE_URL = "divar.ir/v/"
 TOKEN = getenv("TELEGRAM_BOT_TOKEN")
@@ -21,7 +22,6 @@ map = {
     "description": "توضیحات",
     "_id": "لینک",
 }
-
 
 
 def send_to_telegram(data: Dict[str, Any], IDs: List[int] = IDs):
