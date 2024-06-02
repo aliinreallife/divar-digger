@@ -1,8 +1,10 @@
 from time import sleep
 from typing import List
-from keeper.keeper import insert_data, is_id_in_database
-from crawler.crawler import extract_real_estate_data, extract_IDs
+
 from tqdm import tqdm
+
+from crawler.crawler import extract_IDs, extract_real_estate_data
+from keeper.keeper import insert_data, is_id_in_database
 
 
 def blah(
