@@ -1,11 +1,12 @@
+from typing import Any, Dict
+
 from pymongo import MongoClient
-from typing import Dict, Any
 
 # Create a connection to the MongoDB database
 client = MongoClient("mongodb://localhost:27017/")
 
 # Access the database
-db = client["real_estate_data"] # TODO: make it more flexible
+db = client["real_estate_data"]  # TODO: make it more flexible
 
 
 def insert_data(data: Dict[str, Any], collection_name) -> bool:
