@@ -1,6 +1,7 @@
 from typing import List
-from bs4 import BeautifulSoup
+
 import requests
+from bs4 import BeautifulSoup
 
 
 def extract_id_from_href(href: str) -> str:
