@@ -4,6 +4,7 @@ from os import getenv
 
 BASE_URL = "divar.ir/v/"
 TOKEN = getenv("TELEGRAM_BOT_TOKEN")
+IDs = []
 
 map = {
     "title": "عنوان",
@@ -22,7 +23,8 @@ map = {
 }
 
 
-def send_to_telegram(data: Dict[str, Any], IDs: List[int]):
+
+def send_to_telegram(data: Dict[str, Any], IDs: List[int] = IDs):
     text = data_to_text(data)
     for id in IDs:
         response = requests.post(
