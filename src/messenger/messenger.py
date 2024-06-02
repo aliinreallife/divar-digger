@@ -1,6 +1,8 @@
-from typing import Any, Dict, List
-import requests
 from os import getenv
+from typing import Any, Dict, List
+
+import requests
+
 from constants import TELEGRAM_TOKEN
 
 IDs = []
