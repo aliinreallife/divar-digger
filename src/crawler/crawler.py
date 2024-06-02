@@ -136,11 +136,11 @@ def extract_real_estate_data(id: str) -> dict:
             else:
                 data["has_image"] = False
 
-        location = soup.find("div", class_="map-cm--padded")
-        if location:
-            data["has_location"] = True
-        elif data:
-            data["has_location"] = False
+        # location = soup.find("div", class_="map-cm--padded") TODO: fix this
+        # if location:
+        #     data["has_location"] = True
+        # elif data:
+        #     data["has_location"] = False
 
         # Extract the description
         description = soup.find("p", class_="kt-description-row__text")
