@@ -17,7 +17,7 @@ def extract_id_from_href(href: str) -> str:
     return last
 
 
-def extract_links(url: str) -> List[str]:
+def extract_IDs(url: str) -> List[str]:
     """
     Given a URL of a listings page, this function extracts and returns a list of URLs found within <a> tags in divs with the class 'post-list__widget-col-c1444'.
 
@@ -25,7 +25,7 @@ def extract_links(url: str) -> List[str]:
         url (str): The URL of the listings page to scrape.
 
     Returns:
-        List[str]: A list of URLs from the listings.
+        List[str]: A list of IDs from the listings.
     """
     response = requests.get(url)
     IDs = []
@@ -39,7 +39,6 @@ def extract_links(url: str) -> List[str]:
         parent_divs = soup.find_all("div", class_="post-list__widget-col-c1444")
         if not parent_divs:
             print("No parent divs found")
-            print(soup.prettify())
         else:
             for parent in parent_divs:
                 link = parent.find("a")
@@ -66,7 +65,7 @@ def extract_real_estate_data(id: str) -> dict:
         dict: A dictionary containing the title, price, and description of the listing.
     """
     url = "https://divar.ir/v/" + id
-    
+
     response = requests.get(url)
     data = {}
 
@@ -94,6 +93,12 @@ def extract_real_estate_data(id: str) -> dict:
             items = data_row.find_all("td", class_="kt-group-row-item")
             if items and len(items) == 3:
                 metrage = int(items[0].text)
+                try:
+                    year_of_construction = int(items[1].text)
+                except:
+                    year_of_construction = (
+                        1370  # TODO: we should to somthing better for 'قبل از ۱۳۷۰'
+                    )
                 data["metrage"] = metrage
                 data["year_of_construction"] = int(items[1].text)
                 data["number_of_rooms"] = int(items[2].text)
@@ -143,7 +148,7 @@ def extract_real_estate_data(id: str) -> dict:
             data["description"] = description.text.strip()
 
     if data:
-        data["link"] = url
+        data["_id"] = id
     else:
         print("faild to load webpage:", url)
 
