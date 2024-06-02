@@ -1,0 +1,15 @@
+{
+    "title": "عنوان",
+    "price": "قیمت",
+    "metrage": "متراژ",
+    "year_of_construction": "سال ساخت",
+    "number_of_rooms": "تعداد اتاق",
+    "has_elevator": "آسانسور",
+    "has_parking": "پارکینگ",
+    "has_storage_room": "انباری",
+    "agency": "آژانس",
+    "agent": "مشاور",
+    "has_image": "عکس",
+    "description": "توضیحات",
+    "_id": "لینک"
+}

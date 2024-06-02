@@ -1,25 +1,13 @@
+import json
 from typing import Any, Dict, List
+
 import requests
-from os import getenv
-from constants import TELEGRAM_TOKEN
 
+from constants import BASE_URL, TELEGRAM_TOKEN
+
+with open("src/messenger/field_map.json", "r") as f:
+    field_map = json.load(f)
 IDs = []
-
-map = {
-    "title": "عنوان",
-    "price": "قیمت",
-    "metrage": "متراژ",
-    "year_of_construction": "سال ساخت",
-    "number_of_rooms": "تعداد اتاق",
-    "has_elevator": "آسانسور",
-    "has_parking": "پارکینگ",
-    "has_storage_room": "انباری",
-    "agency": "آژانس",
-    "agent": "مشاور",
-    "has_image": "عکس",
-    "description": "توضیحات",
-    "_id": "لینک",
-}
 
 
 def send_to_telegram(data: Dict[str, Any], IDs: List[int] = IDs):
@@ -44,6 +32,6 @@ def data_to_text(data: Dict[str, Any]) -> str:
         elif key == "description":
             value = f"\n--------------------\n{value}"
 
-        persian_key = map[key]
+        persian_key = field_map[key]
         text += f"{persian_key}: {value}\n"
     return text
