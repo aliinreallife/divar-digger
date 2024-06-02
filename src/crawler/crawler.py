@@ -1,7 +1,7 @@
-from typing import List, Dict, Optional
-from bs4 import BeautifulSoup
-import requests
+from typing import Dict, List, Optional
 
+import requests
+from bs4 import BeautifulSoup
 
 BASE_URL = "https://divar.ir/v/"
 PARENT_CLASS = "post-list__widget-col-c1444"
