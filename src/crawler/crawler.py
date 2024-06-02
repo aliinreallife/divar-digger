@@ -147,11 +147,3 @@ def extract_real_estate_data(id: str) -> Optional[Dict[str, any]]:
         print(f"Failed to extract data from {url}")
 
     return data
-
-
-# Example usage:
-# url = "https://example.com/listings"
-# ids = extract_IDs(url)
-# for id in ids:
-#     real_estate_data = extract_real_estate_data(id)
-#     print(real_estate_data)
