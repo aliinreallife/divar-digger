@@ -5,7 +5,7 @@ from typing import Dict, Any
 client = MongoClient("mongodb://localhost:27017/")
 
 # Access the database
-db = client["real_estate_data"]
+db = client["real_estate_data"] # TODO: make it more flexible
 
 
 def insert_data(data: Dict[str, Any], collection_name) -> bool:
