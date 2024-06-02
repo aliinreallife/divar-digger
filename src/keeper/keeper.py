@@ -1,5 +1,6 @@
+from typing import Any, Dict
+
 from pymongo import MongoClient
-from typing import Dict, Any
 
 
 def insert_data(data: Dict[str, Any]) -> bool:

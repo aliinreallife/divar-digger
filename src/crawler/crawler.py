@@ -1,6 +1,7 @@
 from typing import List
-from bs4 import BeautifulSoup
+
 import requests
+from bs4 import BeautifulSoup
 
 
 def extract_id_from_href(href: str) -> str:
@@ -66,7 +67,7 @@ def extract_real_estate_data(id: str) -> dict:
         dict: A dictionary containing the title, price, and description of the listing.
     """
     url = "https://divar.ir/v/" + id
-    
+
     response = requests.get(url)
     data = {}
 
