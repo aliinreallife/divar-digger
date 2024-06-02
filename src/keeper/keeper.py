@@ -1,5 +1,6 @@
+from typing import Any, Dict
+
 from pymongo import MongoClient
-from typing import Dict, Any
 
 # Create a connection to the MongoDB database
 client = MongoClient("mongodb://localhost:27017/")
