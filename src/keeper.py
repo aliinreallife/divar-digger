@@ -13,25 +13,22 @@ mongodb_local_connection_string = f"mongodb://{mongodb_host_port}/"
 local_client = MongoClient(mongodb_local_connection_string)
 
 # Access the local database
-local_db_name = getenv("MONGODB_LOCAL_DB_NAME", "real_estate_data")
-local_db = local_client[local_db_name]
+local_db = local_client["real_estate_data"]
 
 mongodb_online_connection_string = getenv("MONGODB_ONLINE_CONNECTION_STRING")
 
 # Create a connection to the online MongoDB database
-online_db = None
+is_online_db_connected = False
 if mongodb_online_connection_string:
     try:
         online_client = MongoClient(
             mongodb_online_connection_string, serverSelectionTimeoutMS=5000
         )
         online_client.server_info()  # Will raise ServerSelectionTimeoutError if server is not available
-        online_db_name = getenv("MONGODB_ONLINE_DB_NAME", "real_estate_data")
-        online_db = online_client[online_db_name]
+        online_db = online_client["real_estate_data"]
+        is_online_db_connected = True
     except errors.ServerSelectionTimeoutError:
         print("Failed to connect to the online database.")
-else:
-    print("No online database connection string provided.")
 
 
 def insert_data(data: Dict[str, Any], collection_name: str) -> bool:
@@ -46,7 +43,7 @@ def insert_data(data: Dict[str, Any], collection_name: str) -> bool:
     local_collection = local_db[collection_name]
     local_collection.insert_one(data)
 
-    if online_db:
+    if is_online_db_connected:
         online_collection = online_db[collection_name]
         online_collection.insert_one(data)
 
