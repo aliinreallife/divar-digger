@@ -26,7 +26,7 @@ def blah(
         item_IDs: List[str] = extract_IDs(listings_page_url)
 
         if item_IDs:
-            for id in tqdm(item_IDs, desc="Processing items"):
+            for id in item_IDs:
                 if not is_id_in_database(id, collection_name=listings_page_url):
                     print(f"Processing item: {id}")
                     data = extract_real_estate_data(id)
