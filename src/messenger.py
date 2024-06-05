@@ -5,7 +5,7 @@ import requests
 
 from constants import BASE_URL, TELEGRAM_TOKEN
 
-with open("src/messenger/field_map.json", "r") as f:
+with open("src/map_to_persian.json", "r") as f:
     field_map = json.load(f)
 IDs = []
 
