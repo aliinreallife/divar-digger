@@ -1,15 +1,23 @@
+import os
 from time import sleep
 from typing import List
 
+from dotenv import load_dotenv
 from tqdm import tqdm
 
 from crawler import extract_IDs, extract_real_estate_data
 from keeper import insert_data, is_id_in_database
 from messenger import send_to_telegram
 
+load_dotenv()
+
+listings_page_url = os.getenv("LISTINGS_PAGE_URL")
+telegram_user_ids = os.getenv("TELEGRAM_USER_IDS").split(",")
+
 
 def blah(
     listings_page_url: str = "https://divar.ir/s/lavasan/buy-apartment",
+    telegram_user_ids: List[int] = [132654],
     max_retries: int = 16,
 ):
     retries = 0
