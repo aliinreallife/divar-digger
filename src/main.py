@@ -32,7 +32,7 @@ def blah(
                     data = extract_real_estate_data(id)
                     if data:
                         insert_data(data, collection_name=listings_page_url)
-                        send_to_telegram(data)
+                        send_to_telegram(data=data, telegram_IDs=telegram_user_ids)
                     else:
                         print(f"Failed to extract data for item {id}, skipping.")
                 else:
