@@ -16,8 +16,8 @@ telegram_user_ids = os.getenv("TELEGRAM_USER_IDS").split(",")
 
 
 def blah(
-    listings_page_url: str = "https://divar.ir/s/lavasan/buy-apartment",
-    telegram_user_ids: List[int] = [132654],
+    listings_page_url: str,
+    telegram_user_ids: List[int],
     max_retries: int = 16,
 ):
     retries = 0
@@ -47,4 +47,4 @@ def blah(
     print(f"Failed to process after {max_retries} retries.")
 
 
-blah()
+blah(listings_page_url, telegram_user_ids)
