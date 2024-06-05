@@ -1,0 +1,36 @@
+version: '3.6'
+
+services:
+  divar-digger:
+    build: .
+    image: digger-image
+    container_name: divar-digger-app
+    environment:
+      - MONGODB_HOST_PORT=${MONGODB_HOST_PORT}
+      - MONGODB_ONLINE_CONNECTION_STRING=${MONGODB_ONLINE_CONNECTION_STRING}
+    networks:
+      - mongo_net
+    depends_on:
+      - divar-db
+
+  divar-db:
+    image: mongo
+    container_name: divar-db
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+      - MONGO_INITDB_ROOT_USERNAME=${LOCAL_MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${LOCAL_MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongodb:/data/db
+      - mongoconfig:/data/configdb
+    networks:
+      - mongo_net
+
+volumes:
+  mongodb:
+  mongoconfig:
+
+
+networks:
+  mongo_net:
+    driver: bridge
