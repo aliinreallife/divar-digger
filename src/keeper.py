@@ -1,9 +1,16 @@
+from os import getenv
 from typing import Any, Dict
 
+from dotenv import load_dotenv
 from pymongo import MongoClient
 
+load_dotenv()
+
+mongodb_host_port = getenv("MONGODB_HOST_PORT")
+mongodb_connection_string = f"mongodb://{mongodb_host_port}/"
+
 # Create a connection to the MongoDB database
-client = MongoClient("mongodb://localhost:27017/")
+client = MongoClient(mongodb_connection_string)
 
 # Access the database
 db = client["real_estate_data"]  # TODO: make it more flexible
