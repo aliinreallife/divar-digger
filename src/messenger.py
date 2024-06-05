@@ -24,7 +24,7 @@ def data_to_text(data: Dict[str, Any]) -> str:
         value = (
             "دارد" if value is True else "----" if value is False else value
         )  # True or False to دارد و ندارد
-        if key == "price":
+        if key == "price" and isinstance(value, int):
             value = f"{value:,}"
         elif key == "_id":
             value = BASE_URL + value
