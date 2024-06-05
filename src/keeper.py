@@ -6,11 +6,13 @@ from pymongo import MongoClient, errors
 
 load_dotenv()
 
-mongodb_host_port = getenv("MONGODB_HOST_PORT")
-mongodb_local_connection_string = f"mongodb://{mongodb_host_port}/"
+local_mongodb_host_port = getenv("LOCAL_MONGODB_HOST_PORT")
+local_mongodb_connection_string = f"mongodb://{local_mongodb_host_port}"
 
 # Create a connection to the local MongoDB database
-local_client = MongoClient(mongodb_local_connection_string)
+local_client = MongoClient(
+    local_mongodb_connection_string, serverSelectionTimeoutMS=5000
+)
 
 # Access the local database
 local_db = local_client["real_estate_data"]
@@ -27,7 +29,7 @@ if mongodb_online_connection_string:
         online_client.server_info()  # Will raise ServerSelectionTimeoutError if server is not available
         online_db = online_client["real_estate_data"]
         is_online_db_connected = True
-    except errors.ServerSelectionTimeoutError:
+    except:
         print("Failed to connect to the online database.")
 
 
